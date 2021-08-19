@@ -6,4 +6,4 @@ parallel = True
 concurrency = multiprocessing,thread
 
 omit =
-    /metaflow/*
+    metaflow/*
