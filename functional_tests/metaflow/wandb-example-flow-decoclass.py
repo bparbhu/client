@@ -23,6 +23,9 @@ assert:
 
 
 import os
+import sys
+
+sys.modules.pop("coverage", None)
 
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier

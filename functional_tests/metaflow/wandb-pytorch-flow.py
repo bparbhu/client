@@ -26,6 +26,10 @@ assert:
 
 
 import os
+import sys
+
+sys.modules.pop("coverage", None)
+
 from pathlib import Path
 
 import torch

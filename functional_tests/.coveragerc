@@ -4,6 +4,3 @@ parallel = True
 # TODO(jhr): enable this in the future
 # branch = True
 concurrency = multiprocessing,thread
-
-omit =
-    metaflow/*
