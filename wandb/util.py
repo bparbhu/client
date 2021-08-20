@@ -1323,21 +1323,7 @@ def _log_thread_stacks():
                 logger.info("  Line: %s" % line)
 
 
-def sanitize_keys(data: Dict[str, Any]) -> Dict[str, Any]:
-    from wandb.sdk.data_types import Media
-
-    return {(sanitize(k) if isinstance(v, Media) else k): v for k, v in data.items()}
-
-
-def sanitize(key: str) -> str:
+def check_key_windows(key: str) -> bool:
     if platform.system() == "Windows":
-        return key.strip('<>:"/\\|?').strip()
-    else:
-        return key.strip("/").strip()
-
-
-def check_key(key: str) -> bool:
-    if platform.system() == "Windows":
-        return bool(re.match(r"<>:\"/\\|?", key))
-    else:
-        return bool(re.match(r"/", key))
+        return bool(re.match(r"[<>:\"/\\|?]", key))
+    return False

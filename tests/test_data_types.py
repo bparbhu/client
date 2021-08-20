@@ -1078,4 +1078,5 @@ def test_fail_to_make_file(mocked_run, capsys):
     wb_image = wandb.Image(image)
     wb_image.bind_to_run(mocked_run, "  a\sd/a:sd", 0)
     out, err = capsys.readouterr()
-    assert "Could not create media file" in out
+    if platform.system() == "Windows":
+        assert "Invalid character in file name for media logged at key" in err

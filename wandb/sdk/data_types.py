@@ -514,7 +514,7 @@ class Media(WBValue):
         media_path = os.path.join(self.get_media_subdir(), file_path)
         new_path = os.path.join(self._run.dir, media_path)
         util.mkdir_exists_ok(os.path.dirname(new_path))
-        if util.check_key(key):
+        if util.check_key_windows(key):
             raise ValueError(
                 f"Invalid character in file name for media logged at key: {key}"
             )
