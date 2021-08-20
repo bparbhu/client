@@ -56,10 +56,8 @@ class ArtifactProxy:
 
 @typedispatch  # noqa: F811
 def wandb_track(name: str, data: (dict, list, set, str, int, float, bool), run=None, testing=False, *args, **kwargs):  # type: ignore
-    if testing:
-        return "scalar"
-
     run.log({name: data})
+    return data
 
 
 @typedispatch  # noqa: F811
@@ -77,6 +75,7 @@ def wandb_track(
             artifact.add_file(data)
         run.log_artifact(artifact)
         wandb.termlog(f"Logging artifact: {name} ({type(data)})")
+        return artifact
 
 
 @typedispatch  # noqa: F811
@@ -85,34 +84,27 @@ def wandb_track(
     data: pd.DataFrame,
     datasets=False,
     run=None,
-    testing=False,
     *args,
     **kwargs,
 ):
-    if testing:
-        return "pd.DataFrame" if datasets else None
-
     if datasets:
         artifact = wandb.Artifact(name, type="dataset")
         with artifact.new_file(f"{name}.parquet", "wb") as f:
             data.to_parquet(f, engine="pyarrow")
         run.log_artifact(artifact)
         wandb.termlog(f"Logging artifact: {name} ({type(data)})")
+        return artifact
 
 
 @typedispatch  # noqa: F811
-def wandb_track(
-    name: str, data: nn.Module, models=False, run=None, testing=False, *args, **kwargs
-):
-    if testing:
-        return "nn.Module" if models else None
-
+def wandb_track(name: str, data: nn.Module, models=False, run=None, *args, **kwargs):
     if models:
         artifact = wandb.Artifact(name, type="model")
         with artifact.new_file(f"{name}.pkl", "wb") as f:
             torch.save(data, f)
         run.log_artifact(artifact)
         wandb.termlog(f"Logging artifact: {name} ({type(data)})")
+        return artifact
 
 
 @typedispatch  # noqa: F811
@@ -121,35 +113,28 @@ def wandb_track(
     data: BaseEstimator,
     models=False,
     run=None,
-    testing=False,
     *args,
     **kwargs,
 ):
-    if testing:
-        return "BaseEstimator" if models else None
-
     if models:
         artifact = wandb.Artifact(name, type="model")
         with artifact.new_file(f"{name}.pkl", "wb") as f:
             pickle.dump(data, f)
         run.log_artifact(artifact)
         wandb.termlog(f"Logging artifact: {name} ({type(data)})")
+        return artifact
 
 
 # this is the base case
 @typedispatch  # noqa: F811
-def wandb_track(
-    name: str, data, others=False, run=None, testing=False, *args, **kwargs
-):
-    if testing:
-        return "generic" if others else None
-
+def wandb_track(name: str, data, others=False, run=None, *args, **kwargs):
     if others:
         artifact = wandb.Artifact(name, type="other")
         with artifact.new_file(f"{name}.pkl", "wb") as f:
             pickle.dump(data, f)
         run.log_artifact(artifact)
         wandb.termlog(f"Logging artifact: {name} ({type(data)})")
+        return artifact
 
 
 @typedispatch
@@ -197,6 +182,7 @@ def _wandb_use(name: str, data, others=False, run=None, testing=False, *args, **
     if others:
         run.use_artifact(f"{name}:latest")
         wandb.termlog(f"Using artifact: {name} ({type(data)})")
+        return "donezo"
 
 
 def coalesce(*arg):
